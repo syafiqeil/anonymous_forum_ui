@@ -50,7 +50,7 @@ anonymous_forum_ui/
 ├── flake.nix         # Nix build — uses mkLogosQmlModule + core dependency
 ├── metadata.json     # Module config (type: ui_qml, depends on core)
 └── qml/
-    └── Main.qml      # Complete 3-view UI (374 lines)
+    └── Main.qml      # Complete 3-view UI 
 ```
 
 ## Prerequisites
