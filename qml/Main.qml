@@ -68,16 +68,21 @@ Item {
         // Status bar
         Rectangle {
             Layout.fillWidth: true
-            height: statusMessage.length > 0 ? 32 : 0
-            color: "#16213e"
+            height: statusMessage.length > 0 ? 40 : 0
+            color: "#2e7d32"
             radius: 4
             visible: statusMessage.length > 0
 
-            Text {
-                anchors.centerIn: parent
+            TextEdit {
+                anchors.fill: parent
+                anchors.margins: 8
                 text: statusMessage
-                color: "#0f3460"
+                color: "#ffffff"
                 font.pixelSize: 12
+                readOnly: true
+                selectByMouse: true
+                wrapMode: TextEdit.Wrap
+                verticalAlignment: TextEdit.AlignVCenter
             }
         }
 
