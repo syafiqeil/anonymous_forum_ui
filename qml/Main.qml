@@ -18,6 +18,27 @@ Item {
     property int nThreshold: 2
     property int mModerators: 3
 
+    // Helper: convert byte array [30,133,...] to hex string "1e85..."
+    function byteArrayToHex(input) {
+        input = input.trim();
+        // If it looks like a byte array [n,n,...], convert to hex
+        if (input.charAt(0) === '[' && input.charAt(input.length - 1) === ']') {
+            try {
+                var arr = JSON.parse(input);
+                if (Array.isArray(arr) && typeof arr[0] === 'number') {
+                    var hex = '';
+                    for (var i = 0; i < arr.length; i++) {
+                        var b = arr[i].toString(16);
+                        hex += (b.length < 2 ? '0' : '') + b;
+                    }
+                    return hex;
+                }
+            } catch(e) {}
+        }
+        // Already hex or other format — return as-is
+        return input;
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 16
@@ -295,9 +316,10 @@ Item {
                         Button {
                             text: "Issue Strike"
                             onClicked: {
+                                var tag = byteArrayToHex(strikeTagInput.text)
                                 var result = logos.callModule("anonymous_forum_core",
                                     "issueStrike",
-                                    [strikeTagInput.text, strikeShareInput.text,
+                                    [tag, strikeShareInput.text,
                                      modIndexInput.value])
                                 strikeResultArea.text = result
                                 statusMessage = "Strike issued"
@@ -335,9 +357,10 @@ Item {
                         Button {
                             text: "Reconstruct Strike (Tier 1)"
                             onClicked: {
+                                var tag = byteArrayToHex(strikeTagInput.text)
                                 var result = logos.callModule("anonymous_forum_core",
                                     "reconstructStrike",
-                                    [strikeTagInput.text, certsInput.text])
+                                    [tag, certsInput.text])
                                 slashResultArea.text = result
                                 statusMessage = "Tier 1 reconstruct: " + result
                             }
