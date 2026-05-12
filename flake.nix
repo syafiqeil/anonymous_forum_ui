@@ -6,7 +6,7 @@
 
     # Core module dependency — resolved automatically by collectAllModuleDeps
     anonymous_forum_core = {
-      url = "path:../anonymous_forum_core";
+      url = "https://github.com/syafiqeil/anonymous_forum_core";
     };
   };
 
