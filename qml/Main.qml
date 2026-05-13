@@ -236,15 +236,20 @@ Item {
                             }
                         }
 
-                        TextArea {
-                            id: postResultArea
+                        ScrollView {
                             Layout.fillWidth: true
                             Layout.preferredHeight: 150
-                            readOnly: true
-                            placeholderText: "Post payload will appear here (JSON)"
-                            wrapMode: TextArea.Wrap
-                            font.family: "monospace"
-                            font.pixelSize: 11
+                            clip: true
+
+                            TextArea {
+                                id: postResultArea
+                                readOnly: true
+                                placeholderText: "Post payload will appear here (JSON)"
+                                wrapMode: TextArea.Wrap
+                                selectByMouse: true
+                                font.family: "monospace"
+                                font.pixelSize: 11
+                            }
                         }
                     }
                 }
@@ -326,15 +331,20 @@ Item {
                             }
                         }
 
-                        TextArea {
-                            id: strikeResultArea
+                        ScrollView {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 100
-                            readOnly: true
-                            placeholderText: "Strike certificate (JSON)"
-                            wrapMode: TextArea.Wrap
-                            font.family: "monospace"
-                            font.pixelSize: 11
+                            Layout.preferredHeight: 120
+                            clip: true
+
+                            TextArea {
+                                id: strikeResultArea
+                                readOnly: true
+                                placeholderText: "Strike certificate (JSON)"
+                                wrapMode: TextArea.Wrap
+                                selectByMouse: true
+                                font.family: "monospace"
+                                font.pixelSize: 11
+                            }
                         }
                     }
                 }
@@ -383,15 +393,20 @@ Item {
                             }
                         }
 
-                        TextArea {
-                            id: slashResultArea
+                        ScrollView {
                             Layout.fillWidth: true
-                            Layout.preferredHeight: 80
-                            readOnly: true
-                            placeholderText: "Result"
-                            wrapMode: TextArea.Wrap
-                            font.family: "monospace"
-                            font.pixelSize: 11
+                            Layout.preferredHeight: 100
+                            clip: true
+
+                            TextArea {
+                                id: slashResultArea
+                                readOnly: true
+                                placeholderText: "Result"
+                                wrapMode: TextArea.Wrap
+                                selectByMouse: true
+                                font.family: "monospace"
+                                font.pixelSize: 11
+                            }
                         }
                     }
                 }
