@@ -21,7 +21,6 @@ Item {
     // Helper: convert byte array [30,133,...] to hex string "1e85..."
     function byteArrayToHex(input) {
         input = input.trim();
-        // If it looks like a byte array [n,n,...], convert to hex
         if (input.charAt(0) === '[' && input.charAt(input.length - 1) === ']') {
             try {
                 var arr = JSON.parse(input);
@@ -35,8 +34,24 @@ Item {
                 }
             } catch(e) {}
         }
-        // Already hex or other format — return as-is
         return input;
+    }
+
+    // Helper: clean escaped JSON output from IPC — compact byte arrays
+    function cleanJson(raw) {
+        try {
+            var parsed = JSON.parse(raw);
+            if (typeof parsed === 'string') {
+                parsed = JSON.parse(parsed);
+            }
+            var pretty = JSON.stringify(parsed, null, 2);
+            pretty = pretty.replace(/\[\s*\d[\d\s,\n]*\]/g, function(match) {
+                return match.replace(/\s+/g, '').replace(/,/g, ', ');
+            });
+            return pretty;
+        } catch(e) {
+            return raw.replace(/^\"|\"$/g, '').replace(/\\"/g, '"');
+        }
     }
 
     ColumnLayout {
@@ -229,10 +244,9 @@ Item {
                             onClicked: {
                                 var result = logos.callModule("anonymous_forum_core",
                                     "preparePost",
-                                    [messageInput.text, saltInput.text,
-                                     modPubkeysInput.text, nInput.value])
+                                    [messageInput.text, saltInput.text, modPubkeysInput.text, nInput.value])
                                 statusMessage = "Post result: " + result.substring(0, 100) + "..."
-                                postResultArea.text = result
+                                postResultArea.text = cleanJson(result)
                             }
                         }
 
@@ -256,7 +270,15 @@ Item {
             }
 
             // --- Moderate View ---
+            ScrollView {
+                id: moderateScrollView
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                clip: true
+                contentWidth: availableWidth
+
             ColumnLayout {
+                width: moderateScrollView.availableWidth
                 spacing: 12
 
                 Text {
@@ -324,9 +346,8 @@ Item {
                                 var tag = byteArrayToHex(strikeTagInput.text)
                                 var result = logos.callModule("anonymous_forum_core",
                                     "issueStrike",
-                                    [tag, strikeShareInput.text,
-                                     modIndexInput.value])
-                                strikeResultArea.text = result
+                                    [tag, strikeShareInput.text, modIndexInput.value])
+                                strikeResultArea.text = cleanJson(result)
                                 statusMessage = "Strike issued"
                             }
                         }
@@ -371,8 +392,12 @@ Item {
                                 var result = logos.callModule("anonymous_forum_core",
                                     "reconstructStrike",
                                     [tag, certsInput.text])
-                                slashResultArea.text = result
-                                statusMessage = "Tier 1 reconstruct: " + result
+                                slashResultArea.text = cleanJson(result)
+                                if (result.indexOf('error') >= 0) {
+                                    statusMessage = "Tier 1 failed: " + result
+                                } else {
+                                    statusMessage = "Tier 1 complete — s_post reconstructed. Repeat for K different posts."
+                                }
                             }
                         }
 
@@ -388,8 +413,19 @@ Item {
                             onClicked: {
                                 var result = logos.callModule("anonymous_forum_core",
                                     "reconstructNsk", [accStrikesInput.text])
-                                slashResultArea.text = result
-                                statusMessage = "NSK reconstructed — member can be slashed"
+                                slashResultArea.text = cleanJson(result)
+                                if (result.indexOf('error') >= 0) {
+                                    statusMessage = "Tier 2 failed: " + result
+                                } else {
+                                    try {
+                                        var parsed = JSON.parse(result);
+                                        if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                                        var nsk = parsed.nsk || '(unknown)';
+                                        statusMessage = "⚠ NSK computed: " + nsk.substring(0, 16) + "... — Verify this matches the original NSK before on-chain slash."
+                                    } catch(e) {
+                                        statusMessage = "NSK computed — verify against original NSK before submitting slash transaction."
+                                    }
+                                }
                             }
                         }
 
@@ -410,6 +446,7 @@ Item {
                         }
                     }
                 }
+            }
             }
         }
     }
